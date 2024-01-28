@@ -3,22 +3,26 @@ import pickle
 
 import numpy as np
 import simplejpeg
-import netifaces as ni
 import blosc
+import socket
 
 logger = logging.getLogger("plot3d")
 
 def get_ip_address() -> str:
+    """Get the IP address of the current machine."""
 
-    # Get gateway of the network
-    gws = ni.gateways()
+    # https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+
     try:
-        default_gw_name = gws["default"][ni.AF_INET][1]
-        # Get the ip in the default gateway
-        ip = ni.ifaddresses(default_gw_name)[ni.AF_INET][0]["addr"]
-    except KeyError:
-        logger.warning("plot3d: Couldn't find connected network, using 127.0.0.1")
+        # doesn't even have to be reachable
+        s.connect(("10.254.254.254", 1))
+        ip = str(s.getsockname()[0])
+    except:  # noqa E722
         ip = "127.0.0.1"
+    finally:
+        s.close()
 
     return ip
 

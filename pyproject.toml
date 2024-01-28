@@ -24,6 +24,10 @@ dependencies = [
     "pyzmq",
     "PyQt5",
     "pyqtgraph",
+    "PyOpenGL",
+    "blosc",
+    "requests",
+    "simplejpeg",
     "aiohttp"
 ]
 
