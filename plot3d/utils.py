@@ -1,0 +1,35 @@
+import logging
+import pickle
+
+import numpy as np
+import simplejpeg
+import netifaces as ni
+import blosc
+
+logger = logging.getLogger("plot3d")
+
+def get_ip_address() -> str:
+
+    # Get gateway of the network
+    gws = ni.gateways()
+    try:
+        default_gw_name = gws["default"][ni.AF_INET][1]
+        # Get the ip in the default gateway
+        ip = ni.ifaddresses(default_gw_name)[ni.AF_INET][0]["addr"]
+    except KeyError:
+        logger.warning("plot3d: Couldn't find connected network, using 127.0.0.1")
+        ip = "127.0.0.1"
+
+    return ip
+
+def serialize(data):
+    return blosc.compress(pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL))
+
+def deserialize(data_bytes):
+    return pickle.loads(blosc.decompress(data_bytes))
+
+def serialize_image(image: np.ndarray):
+    return simplejpeg.encode_jpeg(np.ascontiguousarray(image))
+
+def deserialize_image(image_bytes: bytes):
+    return simplejpeg.decode_jpeg(image_bytes)
