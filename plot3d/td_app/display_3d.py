@@ -138,11 +138,14 @@ class Display3D(gl.GLViewWidget):
         mesh_cont: MeshContainer = data_chunk.data
 
         # Define the vertices and faces of the mesh
-        mesh_data = gl.MeshData(vertexes=np.array(mesh_cont.mesh.vertices), faces=np.array(mesh_cont.mesh.faces))
+        mesh_data = gl.MeshData(
+            vertexes=np.array(mesh_cont.mesh.vertices), 
+            faces=np.array(mesh_cont.mesh.faces), 
+            vertexColors=np.array(mesh_cont.mesh.visual.vertex_colors)/255, 
+            faceColors=np.array(mesh_cont.mesh.visual.face_colors)/255
+        )
         mesh.setMeshData(
             meshdata=mesh_data,
-            color=mesh_cont.color,
-            edgeColor=mesh_cont.edgeColor,
             drawFaces=mesh_cont.drawFaces,
             drawEdges=mesh_cont.drawEdges
         )

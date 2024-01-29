@@ -105,7 +105,7 @@ class Plot:
     def plot_pointcloud(self, name: str, pts: np.ndarray, colors: Union[np.ndarray, Tuple[float, float, float, float]]=(1.0,1.0,1.0,1.0)):
 
         # Apply correction to the points
-        pts = self._correct_pts(pts)
+        # pts = self._correct_pts(pts)
 
         # Create the container
         pc_container = PointCloudContainer(
