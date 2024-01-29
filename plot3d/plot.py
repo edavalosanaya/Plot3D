@@ -120,6 +120,10 @@ class Plot:
     def reset(self):
         # Update the server via the client
         self.client.send_reset()
+
+    def delete_visual(self, name: str):
+        self.client.delete_visual(name)
+
     
     #####################################################################################
     ## 3D Plotting
