@@ -70,8 +70,7 @@ class Display3D(gl.GLViewWidget):
     def reset_display(self):
 
         # For each visual element, delete them
-        for v in self.visuals.values():
-            self.removeItem(v)
+        self.clear()
 
         # Clear the visuals list
         self.visuals.clear()
@@ -111,10 +110,11 @@ class Display3D(gl.GLViewWidget):
     def delete_visual(self, name: str):
 
         # Obtain and delete
-        item = self.visuals[name]
-        self.removeItem(item)
-        
-        logger.debug(f"{self}: Deleted visual: {name}")
+        if name in self.visuals:
+            item = self.visuals[name]
+            self.removeItem(item)
+            
+            logger.debug(f"{self}: Deleted visual: {name}")
 
     ####################################################################################
     ## Creating visual elements

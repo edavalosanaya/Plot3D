@@ -60,10 +60,13 @@ class Plot:
     ## Trajectory Related Methods
     #####################################################################################
 
-    def plot_line(self, name: str, line: np.ndarray, color: Union[Tuple[float, float, float, float], np.ndarray] = (1.0, 1.0, 1.0, 1.0), width: int = 1):
+    def plot_line(self, name: str, line: np.ndarray, color: Union[Tuple[float, float, float, float], np.ndarray] = (1.0, 1.0, 1.0, 1.0), width: int = 1, correction=False):
 
         # Correct the line to the visualization on the system
-        correct_line = self._correct_pts(line)
+        if correction:
+            correct_line = self._correct_pts(line)
+        else:
+            correct_line = line
 
         # Create container
         line_cont = LineContainer(
@@ -77,10 +80,11 @@ class Plot:
         else:
             self.client.update_visual(name, 'line', line_cont)
 
-    def plot_camera(self, name: str, pose: np.ndarray):
+    def plot_camera(self, name: str, pose: np.ndarray, correction=False):
 
         # Apply a correct transformation
-        pose = self._correct_pose(pose)
+        if correction:
+            pose = self._correct_pose(pose)
 
         # Extract the information here
         camera_center = pose[0:3, 3].reshape((1,3))
@@ -129,15 +133,20 @@ class Plot:
     ## 3D Plotting
     #####################################################################################
    
-    def add_mesh(self, name: str, mesh: trimesh.Trimesh, color:Tuple[float, float, float, float]=(1.0,1.0,1.0,1.0), edgeColor:Tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0), drawFaces:bool=True, drawEdges:bool=False):
+    def add_mesh(self, name: str, mesh: trimesh.Trimesh, color:Tuple[float, float, float, float]=(1.0,1.0,1.0,1.0), edgeColor:Tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0), drawFaces:bool=True, drawEdges:bool=False, correction=False):
 
         if name in self.client.visuals:
             logger.warning(f"{self}: Cannot add mesh that is already added: {name}")
             return
+        
+        if correction:
+            ready_mesh = mesh.apply_transform(self._correction_rt)
+        else:
+            ready_mesh = mesh
 
         # Create container
         mesh_container = MeshContainer(
-            mesh=mesh.apply_transform(self._correction_rt),
+            mesh=ready_mesh,
             color=color,
             edgeColor=edgeColor,
             drawFaces=drawFaces,
@@ -145,15 +154,20 @@ class Plot:
         )
         self.client.create_visual(name, 'mesh', mesh_container)
 
-    def update_mesh(self, name: str, mesh: trimesh.Trimesh, color:Tuple[float, float, float, float]=(1.0,1.0,1.0,1.0), edgeColor:Tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0), drawFaces:bool=True, drawEdges:bool=False):
+    def update_mesh(self, name: str, mesh: trimesh.Trimesh, color:Tuple[float, float, float, float]=(1.0,1.0,1.0,1.0), edgeColor:Tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0), drawFaces:bool=True, drawEdges:bool=False, correction=False):
         
         if name not in self.client.visuals:
             logger.warning(f"{self}: Cannot update mesh that hasn't been added: {name}")
             return
+
+        if correction:
+            ready_mesh = mesh.apply_transform(self._correction_rt)
+        else:
+            ready_mesh = mesh
         
         # Create container
         mesh_container = MeshContainer(
-            mesh=mesh.apply_transform(self._correction_rt),
+            mesh=ready_mesh,
             color=color,
             edgeColor=edgeColor,
             drawFaces=drawFaces,
